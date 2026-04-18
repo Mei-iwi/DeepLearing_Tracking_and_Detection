@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Jupyter / logs
+.ipynb_checkpoints/
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python packaging / cache
+.pytest_cache/
+.mypy_cache/
+.cache/
+
+# Model outputs
+runs/
+checkpoints/
+outputs/
+models/trained/
+*.pth
+*.pt
+
+# Data
+data/train/
+data/val/
+data/test/
+data/raw/
+data/processed/
+
+# Streamlit
+.streamlit/secrets.toml

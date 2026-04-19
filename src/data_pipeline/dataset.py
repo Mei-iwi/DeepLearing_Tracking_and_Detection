@@ -210,6 +210,6 @@ if __name__ == "__main__":
     except Exception as e:
         print("Lỗi khi test dataset.py:", e)
 
-# python data_pipeline/dataset.py
+# python -m pip install pyyaml
 
 # python -m data_pipeline.dataset

@@ -84,10 +84,10 @@ def read_status(status_path: Path) -> str:
 def print_image_progress(phase, batch_idx, total_batches, processed_samples, batch_size):
     start_img_idx = processed_samples + 1
     end_img_idx = processed_samples + batch_size
-    print(
-        f"[{phase}] Batch {batch_idx}/{total_batches} | "
-        f"Đang xử lý ảnh {start_img_idx}-{end_img_idx}"
-    )
+    # print(
+    #     f"[{phase}] Batch {batch_idx}/{total_batches} | "
+    #     f"Đang xử lý ảnh {start_img_idx}-{end_img_idx}"
+    # )
 
 
 def build_model(n_classes: int, device: str):

@@ -27,8 +27,13 @@ class CurrentCNN(nn.Module):
         # Đưa vector đặc trưng vào head phân loại -> đầu ra là logit [N, 512] -> [N, n_classes]
         x = self.classifier(x)
         return x
+    '''
+        Nhận đầu vào là feature map sau stage 4 của backbone: [N, 256, 14, 14] và chạy phần còn lại của mô hình
+    '''
     def forward_from_stage4(self, x):
-        pass
+        x = self.headprep(x)
+        x = self.classifier(x)
+        return x
     
 '''
     Ảnh đầu vào -> backbone -> headprep -> classifier -> logits đầu ra

@@ -1,3 +1,39 @@
+## Huấn luyện 
+python app.py --member-name [Tên thành viên] --package-name [Tên gói pkg_000]a
+python app.py --member-name cuong --package-name pkg_001
+
+cell1
+from google.colab import drive
+drive.mount('/content/drive')
+
+cell2
+!git clone https://github.com/Mei-iwi/DeepLearing_Tracking_and_Detection.git
+%cd DeepLearing_Tracking_and_Detection
+!pip install -U pip setuptools wheel
+!pip install -r requirements_openimages_yolo_safe.txt
+
+cell3
+from pathlib import Path
+
+p = Path("app.py")
+text = p.read_text(encoding="utf-8")
+
+text = text.replace(
+    r'packages_root = r"G:\My Drive\DataOpenImageV7\dataset_openimages_yolo_packages\packages"',
+    'packages_root = r"/content/drive/MyDrive/DeepLearningData/dataset_openimages_yolo_packages/packages"'
+)
+
+text = text.replace(
+    r'shared_ckpt_dir = r"G:\My Drive\DeepLearning\Model1\checkpoints_shared"',
+    'shared_ckpt_dir = r"/content/drive/MyDrive/DeepLearningData/checkpoints_shared"'
+)
+
+p.write_text(text, encoding="utf-8")
+print("Đã sửa app.py cho Colab")
+
+cell4
+!printf "cuong\npkg_001\n" | python app.py
+
 
 ## 1. Cấu trúc thư mục
 

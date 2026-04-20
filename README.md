@@ -48,7 +48,7 @@ project/
 │   │   ├── dataset.py
 │   │   ├── split_data.py
 │   │   ├── transforms.py
-│   │   └── YoloSingleLabelDa...   # tên file bị cắt trong ảnh
+│   │   └── YoloSingleLabelDataset
 │   │
 │   ├── evaluation/
 │   │   ├── evaluate.py

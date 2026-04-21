@@ -1,5 +1,6 @@
 ## Huấn luyện 
 python app.py --member-name [Tên thành viên] --package-name [Tên gói pkg_000]a
+
 python app.py --member-name cuong --package-name pkg_001
 
 cell1

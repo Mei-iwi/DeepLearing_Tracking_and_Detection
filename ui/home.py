@@ -125,7 +125,7 @@ if uploaded_file:
 
     with col1:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.image(image, caption="Ảnh input", use_column_width=True)
+        st.image(image, caption="Ảnh input", width="stretch")
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col2:

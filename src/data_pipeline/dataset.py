@@ -139,12 +139,12 @@ def get_datasets(data_dir, strict_single_label=True):
     Trả về bô (train_loader, val_loader, test_loader)
 '''
 # Chia dữ liệu thành batch để train
-def get_dataloaders(data_dir, batch_size, num_workers=2, pin_memory=True, strict_single_lable=True):
+def get_dataloaders(data_dir, batch_size, num_workers=2, pin_memory=True, strict_single_label=True):
     # Nếu code cũ truyền strict_single_label thì ưu tiên giá trị đó
-    if strict_single_lable is not None:
-        strict_single_lable = strict_single_lable
+    if strict_single_label is not None:
+        strict_single_label = strict_single_label
     # Tạo 3 dataset trước
-    train_dataset, val_dataset, test_dataset = get_datasets(data_dir=data_dir,strict_single_label=strict_single_lable)
+    train_dataset, val_dataset, test_dataset = get_datasets(data_dir=data_dir,strict_single_label=strict_single_label)
 
     # Train loader: shuffle=True để xáo trộn dữ liệu khi học
     train_loader = DataLoader(
@@ -194,7 +194,7 @@ if __name__ == "__main__":
             batch_size=4,
             num_workers=0,
             pin_memory=False,
-            strict_single_lable=True
+            strict_single_label=True
         )
 
         print("Tạo DataLoader thành công.")

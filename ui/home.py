@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-# ===== FIX IMPORT PATH =====
+
 import sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
-# ===== IMPORT =====
 import streamlit as st
 from PIL import Image
 import torch
@@ -20,12 +19,10 @@ from src.models.cnn_model import CurrentCNN
 from src.training.checkpoint import load_checkpoint
 
 
-# ===== CONFIG =====
 CKPT_PATH = r"G:\My Drive\DeepLearning\Model1\checkpoints_shared\best_global_model.pth"
 CLASS_NAMES = ['Person', 'Car', 'Motorcycle', 'Bus']
 
 
-# ===== MODEL =====
 @st.cache_resource
 def load_model():
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -49,7 +46,6 @@ def load_model():
     return model, device
 
 
-# ===== TRANSFORM =====
 def get_transform():
     return T.Compose([
         T.Resize((224, 224)),
@@ -57,7 +53,6 @@ def get_transform():
     ])
 
 
-# ===== PREDICT =====
 def predict(model, device, image):
     x = get_transform()(image).unsqueeze(0).to(device)
 
@@ -69,10 +64,8 @@ def predict(model, device, image):
     return topk.indices.tolist(), topk.values.tolist()
 
 
-# ===== UI CONFIG =====
 st.set_page_config(page_title="Hệ thống phân loại người và vật", layout="wide")
 
-# ===== CSS =====
 st.markdown("""
 <style>
 .stApp {
@@ -115,32 +108,26 @@ h1 {
 """, unsafe_allow_html=True)
 
 
-# ===== HEADER =====
 st.markdown("<h1>Hệ thống phân loại người và vật</h1>", unsafe_allow_html=True)
 st.markdown(
     "<p style='text-align:center; color:#475569;'>Tải 1 ảnh để model dự đoán</p>",
     unsafe_allow_html=True
 )
 
-# ===== LOAD MODEL =====
 model, device = load_model()
 
-# ===== UPLOAD =====
 uploaded_file = st.file_uploader("Chọn ảnh", type=["jpg", "png", "jpeg"])
 
-# ===== MAIN UI =====
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
 
     col1, col2 = st.columns([1, 1])
 
-    # ===== LEFT: IMAGE =====
     with col1:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.image(image, caption="Ảnh input", use_column_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # ===== RIGHT: RESULT =====
     with col2:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
 
@@ -149,7 +136,6 @@ if uploaded_file:
 
         st.subheader("Kết quả dự đoán")
 
-        # Top 1
         top1 = CLASS_NAMES[indices[0]]
         conf1 = values[0]
 
@@ -161,7 +147,6 @@ if uploaded_file:
 
         st.markdown("Tỉ lệ dự đoán")
 
-        # Top 3
         for i in range(len(indices)):
             label = CLASS_NAMES[indices[i]]
             prob = values[i]

@@ -5,18 +5,25 @@ python app.py --member-name cuong --package-name pkg_001
 
 cell1
 from google.colab import drive
+
 drive.mount('/content/drive')
 
 cell2
+
 !git clone https://github.com/Mei-iwi/DeepLearing_Tracking_and_Detection.git
+
 %cd DeepLearing_Tracking_and_Detection
+
 !pip install -U pip setuptools wheel
+
 !pip install -r requirements_openimages_yolo_safe.txt
 
 cell3
+
 from pathlib import Path
 
 p = Path("app.py")
+
 text = p.read_text(encoding="utf-8")
 
 text = text.replace(
@@ -30,9 +37,11 @@ text = text.replace(
 )
 
 p.write_text(text, encoding="utf-8")
+
 print("Đã sửa app.py cho Colab")
 
 cell4
+
 !printf "cuong\npkg_001\n" | python app.py
 
 

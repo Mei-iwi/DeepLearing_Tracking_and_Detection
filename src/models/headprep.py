@@ -18,3 +18,4 @@ class HeadPrep(nn.Module):
         x = self.flatten(x)
         x = self.fc1(x)
         x = self.relu(x)
+        return x

@@ -46,3 +46,6 @@ data/processed/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Repo-local shared storage links
+shared_storage/

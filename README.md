@@ -1,39 +1,71 @@
-## Huấn luyện 
-python app.py --member-name [Tên thành viên] --package-name [Tên gói pkg_000]a
+## Huấn luyện
+# Hướng dẫn thiết lập đường dẫn dùng chung
 
+## Mục đích
+Chuẩn hóa đường dẫn trong repo để mọi thành viên đều dùng chung code mà không phải sửa path theo từng máy.
+
+## Cấu trúc thư mục mong muốn
+```text
+repo_root/
+  app.py
+  shared_storage/
+    dataset_openimages_yolo_packages/   <- link tới thư mục dataset trên Google Drive
+      packages/
+      shared_eval/
+    checkpoints_shared/                 <- link tới thư mục checkpoint trên Google Drive
+```
+
+## Ý tưởng
+Mỗi thành viên tự tạo 2 junction trong thư mục `shared_storage` của repo:
+
+- `shared_storage/dataset_openimages_yolo_packages`
+- `shared_storage/checkpoints_shared`
+
+Khi đó code chỉ cần dùng **đường dẫn tương đối**, không cần hard-code đường dẫn tuyệt đối theo từng máy.
+
+## Ví dụ `dataset.yaml`
+```yaml
+path: .
+train: images/train
+val: ../../shared_eval/images/val
+test: ../../shared_eval/images/test
+```
+
+## Ví dụ lệnh chạy
+```bash
 python app.py --member-name cuong --package-name pkg_001
+```
 
-cell1
-from google.colab import drive
-drive.mount('/content/drive')
+## Lệnh tạo junction trên Windows
+Chạy trong thư mục gốc của repo:
 
-cell2
-!git clone https://github.com/Mei-iwi/DeepLearing_Tracking_and_Detection.git
-%cd DeepLearing_Tracking_and_Detection
-!pip install -U pip setuptools wheel
-!pip install -r requirements_openimages_yolo_safe.txt
+```cmd
+mkdir shared_storage
+mklink /J "shared_storage\checkpoints_shared" "G:\My Drive\DeepLearning\Model1\checkpoints_shared"
+mklink /J "shared_storage\dataset_openimages_yolo_packages" "G:\My Drive\DataOpenImageV7\dataset_openimages_yolo_packages"
+dir /AL shared_storage
+```
 
-cell3
-from pathlib import Path
+## Lưu ý quan trọng
+Phải tạo:
 
-p = Path("app.py")
-text = p.read_text(encoding="utf-8")
+```text
+shared_storage\dataset_openimages_yolo_packages
+```
 
-text = text.replace(
-    r'packages_root = r"G:\My Drive\DataOpenImageV7\dataset_openimages_yolo_packages\packages"',
-    'packages_root = r"/content/drive/MyDrive/DeepLearningData/dataset_openimages_yolo_packages/packages"'
-)
+trỏ tới:
 
-text = text.replace(
-    r'shared_ckpt_dir = r"G:\My Drive\DeepLearning\Model1\checkpoints_shared"',
-    'shared_ckpt_dir = r"/content/drive/MyDrive/DeepLearningData/checkpoints_shared"'
-)
+```text
+G:\My Drive\DataOpenImageV7\dataset_openimages_yolo_packages
+```
 
-p.write_text(text, encoding="utf-8")
-print("Đã sửa app.py cho Colab")
+**Không trỏ thẳng vào thư mục `packages`**, vì project còn cần cả:
 
-cell4
-!printf "cuong\npkg_001\n" | python app.py
+- `packages`
+- `shared_eval`
+
+## Kết luận
+Cách làm này giúp mọi thành viên dùng cùng một cấu trúc đường dẫn, giảm lỗi và không phải sửa code theo từng máy.
 
 
 ## 1. Cấu trúc thư mục

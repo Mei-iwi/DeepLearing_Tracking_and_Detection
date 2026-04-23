@@ -46,6 +46,12 @@ mklink /J "shared_storage\dataset_openimages_yolo_packages" "G:\My Drive\DataOpe
 dir /AL shared_storage
 ```
 
+## Đổi lại đường dẫn tương đối trên file yaml của mỗi gói: -> Quan trọng
+
+```
+python src/help/rewrite_existing_package_yaml_relative.py 
+```
+
 ## Lưu ý quan trọng
 Phải tạo:
 

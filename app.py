@@ -169,8 +169,8 @@ def main():
     print('Data dir:', data_dir)
 
     if not data_dir.exists():
-        print(f'Khong tim thay package: {data_dir}')
-        print('Hay tao junction/symlink trong repo: shared_storage/... hoặc truyen --packages-root cho dung.')
+        print(f'Không tìm thấy package: {data_dir}')
+        print('Hãy tạo junction/symlink trong repo: shared_storage/... hoặc truyền --packages-root cho đúng.')
         return
 
     batch_size = args.batch_size
@@ -239,9 +239,9 @@ def main():
                 checkpoint_path=str(latest_ckpt_path),
                 device=device,
             )
-            print(f'Da nap checkpoint moi nhat: {latest_ckpt_path}')
-            print(f'Train tiep tu epoch: {start_epoch}')
-            print(f'Best val acc hien tai: {best_val_acc:.4f}')
+            print(f'Đã nạp checkpoint mới nhất: {latest_ckpt_path}')
+            print(f'Train tiếp tục epoch: {start_epoch}')
+            print(f'Best val acc hiện tại: {best_val_acc:.4f}')
 
         end_epoch = start_epoch + epochs - 1
 
@@ -295,7 +295,7 @@ def main():
                     save_path=str(best_ckpt_path),
                 )
 
-                print(f'-> Da cap nhat best global checkpoint tai: {best_ckpt_path}')
+                print(f'-> Đã cập nhật best global checkpoint tại: {best_ckpt_path}')
 
         if best_ckpt_path.exists():
             model, optimizer, _, best_metric = load_checkpoint(
@@ -304,7 +304,7 @@ def main():
                 checkpoint_path=str(best_ckpt_path),
                 device=device,
             )
-            print(f'\nDa nap best global checkpoint | best_val_acc = {best_metric:.4f}')
+            print(f'\nĐã nạp best global checkpoint | best_val_acc = {best_metric:.4f}')
 
         test_loss, test_acc = validate_one_epoch(
             model=model,

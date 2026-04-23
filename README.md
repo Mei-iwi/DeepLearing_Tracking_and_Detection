@@ -1,5 +1,4 @@
-## Huấn luyện
-# Hướng dẫn thiết lập đường dẫn dùng chung
+# Hướng dẫn thiết lập đường dẫn dùng chung cho huấn luyện
 
 ## Mục đích
 Chuẩn hóa đường dẫn trong repo để mọi thành viên đều dùng chung code mà không phải sửa path theo từng máy.

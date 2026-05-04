@@ -30,7 +30,7 @@ class Model4MobileNetV2(nn.Module):
 
         self.classifier = nn.Sequential(
             nn.Dropout(p=0.2),
-            nn.Linear(in_features, num_classes)
+            nn.Linear(in_features, num_classes) # type: ignore
         )
 
     def forward(self, x):

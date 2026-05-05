@@ -11,7 +11,7 @@ class ClassifierHead(nn.Module):
         super(ClassifierHead, self).__init__()
 
         self.classifier = nn.Sequential(
-            nn.Linear(128 * 16 * 16, 128),
+            nn.Linear(128 * 28 * 28, 128),
             nn.ReLU(),
             nn.Dropout(0.5),
             nn.Linear(128, n_classes)

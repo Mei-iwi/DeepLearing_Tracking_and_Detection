@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 import torch
+import csv
 
 # Đảm bảo chạy được khi gọi: python app.py từ thư mục gốc project
 ROOT = Path(__file__).resolve().parent
@@ -105,6 +106,159 @@ def read_status(status_path: Path) -> str:
     if not status_path.exists():
         return ""
     return status_path.read_text(encoding="utf-8")
+
+
+def safe_save_checkpoint(
+    model,
+    optimizer,
+    epoch: int,
+    best_metric: float,
+    save_path: Path,
+) -> None:
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+    save_checkpoint(
+        model=model,
+        optimizer=optimizer,
+        epoch=epoch,
+        best_metric=best_metric,
+        save_path=str(save_path),
+    )
+
+def append_csv_row(csv_path: Path, fieldnames: list[str], row: dict) -> None:
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+
+    file_exists = csv_path.exists()
+
+    with csv_path.open("a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+
+        if not file_exists:
+            writer.writeheader()
+
+        writer.writerow(row)
+
+
+def write_epoch_log(
+    log_path: Path,
+    model_name: str,
+    package_name: str,
+    member_name: str,
+    epoch: int,
+    train_loss: float,
+    train_acc: float,
+    val_loss: float,
+    val_acc: float,
+    best_val_acc: float,
+    latest_ckpt_path: Path,
+    best_ckpt_path: Path,
+) -> None:
+    fieldnames = [
+        "time",
+        "model",
+        "package",
+        "member",
+        "epoch",
+        "train_loss",
+        "train_acc",
+        "val_loss",
+        "val_acc",
+        "best_val_acc",
+        "latest_checkpoint",
+        "best_checkpoint",
+    ]
+
+    row = {
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "model": model_name,
+        "package": package_name,
+        "member": member_name,
+        "epoch": epoch,
+        "train_loss": f"{train_loss:.6f}",
+        "train_acc": f"{train_acc:.6f}",
+        "val_loss": f"{val_loss:.6f}",
+        "val_acc": f"{val_acc:.6f}",
+        "best_val_acc": f"{best_val_acc:.6f}",
+        "latest_checkpoint": str(latest_ckpt_path),
+        "best_checkpoint": str(best_ckpt_path),
+    }
+
+    append_csv_row(log_path, fieldnames, row)
+
+
+def write_best_log(
+    log_path: Path,
+    model_name: str,
+    package_name: str,
+    member_name: str,
+    epoch: int,
+    train_loss: float,
+    train_acc: float,
+    val_loss: float,
+    val_acc: float,
+    best_ckpt_path: Path,
+) -> None:
+    fieldnames = [
+        "time",
+        "model",
+        "package",
+        "member",
+        "best_epoch",
+        "train_loss",
+        "train_acc",
+        "val_loss",
+        "best_val_acc",
+        "best_checkpoint",
+    ]
+
+    row = {
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "model": model_name,
+        "package": package_name,
+        "member": member_name,
+        "best_epoch": epoch,
+        "train_loss": f"{train_loss:.6f}",
+        "train_acc": f"{train_acc:.6f}",
+        "val_loss": f"{val_loss:.6f}",
+        "best_val_acc": f"{val_acc:.6f}",
+        "best_checkpoint": str(best_ckpt_path),
+    }
+
+    append_csv_row(log_path, fieldnames, row)
+
+def write_test_log(
+    log_path: Path,
+    model_name: str,
+    package_name: str,
+    member_name: str,
+    test_loss: float,
+    test_acc: float,
+    best_val_acc: float,
+    best_ckpt_path: Path,
+) -> None:
+    fieldnames = [
+        "time",
+        "model",
+        "package",
+        "member",
+        "test_loss",
+        "test_acc",
+        "best_val_acc",
+        "best_checkpoint",
+    ]
+
+    row = {
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "model": model_name,
+        "package": package_name,
+        "member": member_name,
+        "test_loss": f"{test_loss:.6f}",
+        "test_acc": f"{test_acc:.6f}",
+        "best_val_acc": f"{best_val_acc:.6f}",
+        "best_checkpoint": str(best_ckpt_path),
+    }
+
+    append_csv_row(log_path, fieldnames, row)
 
 
 def print_image_progress(phase, batch_idx, total_batches, processed_samples, batch_size):
@@ -240,6 +394,9 @@ def main() -> None:
     print("Packages root:", packages_root)
     print("Checkpoint root:", shared_ckpt_root)
     print("Data dir:", data_dir)
+    model_ckpt_dir = shared_ckpt_root / args.model_name
+    model_ckpt_dir.mkdir(parents=True, exist_ok=True)
+    print("Model checkpoint dir:", model_ckpt_dir)
 
     if not data_dir.exists():
         print(f"Không tìm thấy package: {data_dir}")
@@ -258,12 +415,14 @@ def main() -> None:
     # shared_storage/checkpoints_shared/model_1/latest_resume_model.pth
     # shared_storage/checkpoints_shared/model_1/best_model.pth
     # shared_storage/checkpoints_shared/model_1/training_status.txt
-    model_ckpt_dir = shared_ckpt_root / args.model_name
-    model_ckpt_dir.mkdir(parents=True, exist_ok=True)
 
     latest_ckpt_path = model_ckpt_dir / "latest_resume_model.pth"
     best_ckpt_path = model_ckpt_dir / "best_model.pth"
     status_path = model_ckpt_dir / "training_status.txt"
+    train_log_path = model_ckpt_dir / "train_log.csv"
+    best_log_path = model_ckpt_dir / "best_log.csv"
+    test_log_path = model_ckpt_dir / "test_log.csv"
+    
 
     old_status = read_status(status_path)
     if (not args.ignore_busy) and ("status: busy" in old_status):
@@ -350,31 +509,54 @@ def main() -> None:
             print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f}")
             print(f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f}")
 
-            save_checkpoint(
+            is_best = val_acc > best_val_acc
+
+            if is_best:
+                best_val_acc = val_acc
+
+            safe_save_checkpoint(
                 model=model,
                 optimizer=optimizer,
                 epoch=epoch,
                 best_metric=best_val_acc,
-                save_path=str(latest_ckpt_path),
+                save_path=latest_ckpt_path,
             )
 
-            if val_acc > best_val_acc:
-                best_val_acc = val_acc
+            write_epoch_log(
+                log_path=train_log_path,
+                model_name=args.model_name,
+                package_name=package_name,
+                member_name=member_name,
+                epoch=epoch,
+                train_loss=train_loss,
+                train_acc=train_acc,
+                val_loss=val_loss,
+                val_acc=val_acc,
+                best_val_acc=best_val_acc,
+                latest_ckpt_path=latest_ckpt_path,
+                best_ckpt_path=best_ckpt_path,
+            )
 
-                save_checkpoint(
+            if is_best:
+                safe_save_checkpoint(
                     model=model,
                     optimizer=optimizer,
                     epoch=epoch,
                     best_metric=best_val_acc,
-                    save_path=str(latest_ckpt_path),
+                    save_path=best_ckpt_path,
                 )
 
-                save_checkpoint(
-                    model=model,
-                    optimizer=optimizer,
+                write_best_log(
+                    log_path=best_log_path,
+                    model_name=args.model_name,
+                    package_name=package_name,
+                    member_name=member_name,
                     epoch=epoch,
-                    best_metric=best_val_acc,
-                    save_path=str(best_ckpt_path),
+                    train_loss=train_loss,
+                    train_acc=train_acc,
+                    val_loss=val_loss,
+                    val_acc=val_acc,
+                    best_ckpt_path=best_ckpt_path,
                 )
 
                 print(f"-> Đã cập nhật best checkpoint: {best_ckpt_path}")
@@ -403,6 +585,17 @@ def main() -> None:
         print(f"Package: {package_name}")
         print(f"Test Loss: {test_loss:.4f}")
         print(f"Test Acc: {test_acc:.4f}")
+
+        write_test_log(
+    log_path=test_log_path,
+    model_name=args.model_name,
+    package_name=package_name,
+    member_name=member_name,
+    test_loss=test_loss,
+    test_acc=test_acc,
+    best_val_acc=best_val_acc,
+    best_ckpt_path=best_ckpt_path,
+)
 
         write_status(
             status_path,

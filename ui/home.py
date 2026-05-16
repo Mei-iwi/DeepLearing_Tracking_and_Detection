@@ -17,25 +17,26 @@ from src.models.common.factory import build_model
 from src.training.checkpoint import load_checkpoint
 
 
-CLASS_NAMES = ['Person', 'Car', 'Motorcycle', 'Bus']
+CLASS_NAMES = ["Person", "Car", "Motorcycle", "Bus"]
 CKPT_ROOT = ROOT / "shared_storage" / "checkpoints_shared"
 
 
-def get_checkpoint_path(model_name: str, package_name: str = "pkg_001") -> Path:
-    return CKPT_ROOT / model_name / package_name / "best_model.pth"
+def get_checkpoint_path(model_name: str) -> Path:
+    return CKPT_ROOT / model_name / "best_model.pth"
 
 
 @st.cache_resource
-def load_model(model_name: str, package_name: str):
+def load_model(model_name: str):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     model = build_model(
         model_name=model_name,
         n_classes=len(CLASS_NAMES),
-        device=device
+        device=device,
     )
 
-    ckpt_path = get_checkpoint_path(model_name, package_name)
+    ckpt_path = get_checkpoint_path(model_name)
+
     if not ckpt_path.exists():
         raise FileNotFoundError(f"Không tìm thấy checkpoint: {ckpt_path}")
 
@@ -45,12 +46,11 @@ def load_model(model_name: str, package_name: str):
         model=model,
         optimizer=dummy_optimizer,
         checkpoint_path=str(ckpt_path),
-        device=device
+        device=device,
     )
 
     model.eval()
     return model, device, ckpt_path
-
 
 def get_transform():
     return T.Compose([
@@ -111,7 +111,7 @@ model_name = st.sidebar.selectbox(
     ["model_1", "model_2", "model_3", "model_4"],
     index=0
 )
-package_name = st.sidebar.text_input("Package checkpoint", value="pkg_001")
+st.sidebar.caption("Checkpoint dùng chung theo model")
 
 st.markdown("<h1>Hệ thống phân loại người và vật</h1>", unsafe_allow_html=True)
 st.markdown(
@@ -120,7 +120,7 @@ st.markdown(
 )
 
 try:
-    model, device, ckpt_path = load_model(model_name, package_name)
+    model, device, ckpt_path = load_model(model_name)
     st.sidebar.success(f"Đã nạp: {ckpt_path.name}")
     st.sidebar.caption(str(ckpt_path))
 except Exception as e:

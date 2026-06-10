@@ -8,6 +8,7 @@ class ResNet18Backbone(nn.Module):
 
         weights = ResNet18_Weights.DEFAULT
         base = resnet18(weights=weights)
+
         base.fc = nn.Identity()
         self.base = base
 
@@ -15,9 +16,9 @@ class ResNet18Backbone(nn.Module):
             for param in self.base.parameters():
                 param.requires_grad = False
 
-            if fine_tune:
-                for param in self.base.layer4.parameters():
-                    param.requires_grad = True
+        if fine_tune:
+            for param in self.base.layer4.parameters():
+                param.requires_grad = True
 
     def forward(self, x):
         return self.base(x)
